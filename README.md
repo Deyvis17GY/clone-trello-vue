@@ -1,29 +1,47 @@
-# watch-us-build-trello
+# trello clone
 
-## Project setup
+Application with vue 2 to create tasks with drag and drop dynamics
+
+![demo](./docs/img/demo.gif)
+
+## Demo
+
+https://deyvis17gy.github.io/clon-trello-vue/
+
+## Run Locally
+
+Clone the project
+
 ```
-yarn install
+git clone https://github.com/Deyvis17GY/clon-trello-vue.git
 ```
 
-### Compiles and hot-reloads for development
+Go to the project directory
+
+```
+cd my-project
+```
+
+Install dependencies
+
+```
+yarn run install
+```
+
+Start the server
+
 ```
 yarn run serve
 ```
 
-### Compiles and minifies for production
+Compiles and minifies for production
+
 ```
 yarn run build
 ```
 
-### Run your tests
-```
-yarn run test
-```
+## Features
 
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- download the progress of tasks and progress
+- import from another JSON file downloaded projects
+- delete tasks and columns

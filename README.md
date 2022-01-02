@@ -42,6 +42,6 @@ yarn run build
 
 ## Features
 
-- download the progress of tasks and progress
-- import from another JSON file downloaded projects
+- download the project to use in another browser
+- import a downloaded project from another JSON file
 - delete tasks and columns

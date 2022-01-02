@@ -30,7 +30,7 @@
       @dragover.prevent
       @dragenter.prevent
     >
-      {{ textValue }}
+      Drag and drop items here to remove
     </div>
     <div class="container-float">
       <button title="Import" @click="activeInputUpload" class="upload">
@@ -76,17 +76,23 @@
         </svg>
       </button>
     </div>
+    <button style="display:none" class="removeTask"></button>
+    <Alert
+      :value="textConfirm"
+      :timeSeconds="500"
+      :styleAlert="changeStyleConfirm"
+    />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import miniAlert from "mini-alert";
-import "mini-alert/miniAlert.css";
 import BoardColumn from "@/components/BoardColumn";
+import Alert from "@/components/Alert";
 export default {
   components: {
-    BoardColumn
+    BoardColumn,
+    Alert
   },
   computed: {
     ...mapState(["board"]),
@@ -101,7 +107,10 @@ export default {
         removeTask: true,
         activeItemRemove: false
       },
-      textValue: "Drag and drop items here to remove"
+      textConfirm: "",
+      changeStyleConfirm: {
+        opacity: 0
+      }
     };
   },
   methods: {
@@ -183,21 +192,19 @@ export default {
       };
     },
     alertConfirm(text, timeSeconds = 700) {
-      miniAlert({
-        overflow: true, // <-- disable behind the alert
-        autoremove: true, // <-- automatic remove
-        time: timeSeconds, // <-- milliseconds
-        size: "small", // <-- small, medium, large
-        cartoon: false, // <-- "cartoon effect" true/false
-        limit: 4, // <-- max alerts visible at the same time
-        text: text
-      });
+      this.textConfirm = text;
+      this.changeStyleConfirm.opacity = 1;
+
+      setTimeout(() => {
+        this.changeStyleConfirm.opacity = 0;
+      }, (timeSeconds += 1000));
     }
-  }
+  },
+  mounted() {}
 };
 </script>
 
-<style lang="css">
+<style>
 .task {
   @apply flex items-center flex-wrap shadow mb-2 py-2 px-2 rounded bg-white text-grey-darkest no-underline;
 }
@@ -269,7 +276,8 @@ export default {
   text-align: center;
   align-items: center;
 }
-.upload:hover, .download:hover{
+.upload:hover,
+.download:hover {
   background: #ffffff;
   color: hsl(207, 94%, 20%);
   border: #ffffff;

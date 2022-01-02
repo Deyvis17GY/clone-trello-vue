@@ -13,13 +13,13 @@ https://deyvis17gy.github.io/clon-trello-vue/
 Clone the project
 
 ```
-git clone https://github.com/Deyvis17GY/clon-trello-vue.git
+git clone https://github.com/Deyvis17GY/clone-trello-vue.git
 ```
 
 Go to the project directory
 
 ```
-cd my-project
+cd clone-trello-vue
 ```
 
 Install dependencies

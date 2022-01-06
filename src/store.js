@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import defaultBoard from "./default-board";
 import { saveStatePlugin, uuid } from "./utils";
+import { format } from "@/utils";
 
 Vue.use(Vuex);
 
@@ -14,7 +15,7 @@ export default new Vuex.Store({
   },
   getters: {
     getTask(state) {
-      return id => {
+      return (id) => {
         for (const column of state.board.columns) {
           for (const task of column.tasks) {
             if (task.id === id) {
@@ -30,7 +31,15 @@ export default new Vuex.Store({
       tasks.push({
         name,
         id: uuid(),
-        description: ""
+        description: "",
+        date: format(new Date(), "es-ES", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+          // hour: "2-digit",
+          // minute: "2-digit",
+          // second: "2-digit"
+        })
       });
     },
     UPDATE_TASK(state, { task, key, value }) {

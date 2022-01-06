@@ -67,5 +67,6 @@ export default {
 .column {
   @apply bg-grey-light p-2 mr-4 text-left shadow rounded;
   min-width: 350px;
+  overflow: hidden;
 }
 </style>

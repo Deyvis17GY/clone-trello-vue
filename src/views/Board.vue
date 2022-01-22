@@ -209,5 +209,6 @@ export default {
   background-color: #3e91cc;
   color: black;
   border: 4px dashed #0a2463;
+  cursor: progress;
 }
 </style>

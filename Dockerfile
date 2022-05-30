@@ -1,6 +1,6 @@
 FROM node:12
-WORKDIR /appnodejs
-ADD . /appnodejs
+WORKDIR /clonetrello
+ADD . /clonetrello
 RUN npm install
-EXPOSE 3000
+EXPOSE 4000
 CMD npm start

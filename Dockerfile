@@ -1,6 +1,6 @@
 FROM node:12
-WORKDIR /clonetrello
-ADD . /clonetrello
+WORKDIR /clone-trello
+ADD . /clone-trello
 RUN npm install
 EXPOSE 4000
 CMD npm start

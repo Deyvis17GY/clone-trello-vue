@@ -6,6 +6,7 @@
   left: 0;
   background: transparent;
   z-index: 99998;
+  color: #000;
 }
 
 .miniAlert {

@@ -24,8 +24,8 @@
     </div>
     <div
       :class="activeItemRemove"
-      @dragover.stop="activeRemove"
-      @dragleave.self="leaveRemove"
+      @dragenter="activeRemove"
+      @dragleave="leaveRemove"
       @drop="dropItem"
       @dragover.prevent
       @dragenter.prevent
@@ -92,9 +92,11 @@ export default {
       this.alertConfirm("Column created");
     },
     activeRemove(e) {
+      console.debug("activeRemove", e);
       this.activeItemRemove.activeItemRemove = true;
     },
     leaveRemove(e) {
+      console.debug("leaveRemove", e);
       this.activeItemRemove.activeItemRemove = false;
     },
     dropItem(e) {
@@ -209,6 +211,5 @@ export default {
   background-color: #3e91cc;
   color: black;
   border: 4px dashed #0a2463;
-  cursor: progress;
 }
 </style>

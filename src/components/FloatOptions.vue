@@ -47,6 +47,38 @@
         <line x1="12" y1="4" x2="12" y2="16" />
       </svg>
     </button>
+    <button
+      title="Save Telegram"
+      @click="$emit('telegramSave')"
+      class="telegram"
+    >
+      <svg
+        width="54"
+        height="54"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="16" cy="16" r="14" fill="url(#paint0_linear_87_7225)" />
+        <path
+          d="M22.9866 10.2088C23.1112 9.40332 22.3454 8.76755 21.6292 9.082L7.36482 15.3448C6.85123 15.5703 6.8888 16.3483 7.42147 16.5179L10.3631 17.4547C10.9246 17.6335 11.5325 17.541 12.0228 17.2023L18.655 12.6203C18.855 12.4821 19.073 12.7665 18.9021 12.9426L14.1281 17.8646C13.665 18.3421 13.7569 19.1512 14.314 19.5005L19.659 22.8523C20.2585 23.2282 21.0297 22.8506 21.1418 22.1261L22.9866 10.2088Z"
+          fill="white"
+        />
+        <defs>
+          <linearGradient
+            id="paint0_linear_87_7225"
+            x1="16"
+            y1="2"
+            x2="16"
+            y2="30"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stop-color="#37BBFE" />
+            <stop offset="1" stop-color="#007DBB" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </button>
     <button class="active-float">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +120,7 @@ export default {
   z-index: 100000;
 }
 .container-float:hover {
-  height: 180px;
+  height: 240px;
   cursor: pointer;
 }
 .active-float {
@@ -116,6 +148,10 @@ export default {
   visibility: visible;
   bottom: 120px;
 }
+.container-float:hover .telegram {
+  visibility: visible;
+  bottom: 180px;
+}
 .download:hover:before {
   visibility: visible;
   background: #d8315b;
@@ -123,6 +159,10 @@ export default {
 .upload:hover:before {
   visibility: visible;
   background: #283593;
+}
+.telegram:hover:before {
+  visibility: visible;
+  background: #1c6a97;
 }
 .download::before {
   content: "Download data";
@@ -138,7 +178,16 @@ export default {
   background: #283593;
   border: 1px solid #283593;
   position: absolute;
-  left: -140px;
+  left: -120px;
+  padding: 0.5em;
+  visibility: hidden;
+}
+.telegram::before {
+  content: "Save Telegram data";
+  background: #1c6a97;
+  border: 1px solid #1c6a97;
+  position: absolute;
+  left: -180px;
   padding: 0.5em;
   visibility: hidden;
 }
@@ -180,8 +229,26 @@ export default {
   visibility: hidden;
   transition: all 1s;
 }
+.telegram {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  color: #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  z-index: 9070;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  visibility: hidden;
+  transition: all 1s;
+}
 .upload:active,
-.download:active {
+.download:active,
+.telegram:active {
   border: none;
   outline: none;
   transform: scale(0.9);

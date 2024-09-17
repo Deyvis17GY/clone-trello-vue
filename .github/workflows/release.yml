@@ -1,0 +1,34 @@
+name: Releases
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: cache lookup
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18.x"
+      - name: install dependencies
+        if: ${{ steps.cache.outputs.cache-hit != true }}
+        run: yarn install --frozen-lockfile
+      - name: release version
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

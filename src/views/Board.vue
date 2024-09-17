@@ -22,6 +22,9 @@
     <div class="task-bg" v-if="isTaskOpen" @click.self="closeTask">
       <router-view />
     </div>
+    <div class="task-bg" v-if="isTelegramForm" @click.self="closeTelegramForm">
+      <FormTelegram @onSaveData="onSaveData" />
+    </div>
     <div
       :class="activeItemRemove"
       @dragenter="activeRemove"
@@ -36,6 +39,7 @@
     <FloatOptions
       @changeInput="uploadBdJson"
       @clickDownload="downloadBdTaskColumns"
+      @telegramSave="showTelegramForm"
     />
 
     <button style="display: none" class="removeTask"></button>
@@ -52,11 +56,13 @@ import { mapState } from "vuex";
 import BoardColumn from "@/components/BoardColumn";
 import Alert from "@/components/Alert";
 import FloatOptions from "@/components/FloatOptions";
+import FormTelegram from "./FormTelegram.vue";
 export default {
   components: {
     BoardColumn,
     Alert,
-    FloatOptions
+    FloatOptions,
+    FormTelegram
   },
   computed: {
     ...mapState(["board"]),
@@ -74,7 +80,8 @@ export default {
       textConfirm: "",
       changeStyleConfirm: {
         opacity: 0
-      }
+      },
+      isTelegramForm: false
     };
   },
   methods: {
@@ -92,7 +99,6 @@ export default {
       this.alertConfirm("Column created");
     },
     activeRemove(e) {
-      console.debug("activeRemove", e);
       this.activeItemRemove.activeItemRemove = true;
     },
     leaveRemove(e) {
@@ -160,6 +166,59 @@ export default {
       setTimeout(() => {
         this.changeStyleConfirm.opacity = 0;
       }, (timeSeconds += 1000));
+    },
+    showTelegramForm() {
+      this.isTelegramForm = true;
+    },
+    closeTelegramForm() {
+      this.isTelegramForm = false;
+    },
+    onSaveData(e) {
+      e.preventDefault();
+
+      let message = `**${"trello clone"}:**\n\n`;
+      this.board.columns.forEach((column) => {
+        const columnName =
+          typeof column.name === "string"
+            ? column.name.charAt(0).toUpperCase() + column.name.slice(1)
+            : "Unnamed Column";
+        message += `*${columnName}*:\n`;
+
+        column.tasks.forEach((task) => {
+          message += `• *${task.name}*:\n`;
+          message += `  - ID: ${task.id}\n`;
+          message += `  - Descripcoón: ${task.description || "None"}\n`;
+          if (task.date) {
+            message += `  - Date: ${task.date}\n`;
+          }
+          message += "\n";
+        });
+      });
+
+      const formData = Object.fromEntries(new FormData(e.target));
+
+      fetch(`https://api.telegram.org/bot${formData.token}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: formData.chatId,
+          text: message, // El mensaje con el JSON formateado.
+          parse_mode: "Markdown"
+        })
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.debug("Mensaje enviado:", data);
+          this.$store.commit("UPDATE_TELEGRAM_INFO", {
+            telegramInfo: {
+              chatId: formData.chatId,
+              token: formData.token
+            }
+          });
+        })
+        .catch((error) => console.error("Error:", error));
     }
   },
   mounted() {}

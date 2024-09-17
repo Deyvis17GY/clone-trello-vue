@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "deploy": "sh deploy.sh",
@@ -21,6 +21,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@fullhuman/postcss-purgecss": "^1.1.0",
     "@ky-is/vue-cli-plugin-tailwind": "^1.6.0",
     "@vue/cli-plugin-babel": "^3.5.0",

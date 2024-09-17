@@ -24,6 +24,9 @@ export default new Vuex.Store({
           }
         }
       };
+    },
+    getTelegramInfo(state) {
+      return state.board.telegram;
     }
   },
   mutations: {
@@ -71,6 +74,18 @@ export default new Vuex.Store({
     },
     IMPORT_DATA(state, { board }) {
       state.board = board;
+    },
+    UPDATE_TELEGRAM_INFO_BY_KEY(state, { value, key }) {
+      if (state.board?.telegram) {
+        state.board.telegram[key] = value;
+      } else {
+        state.board.telegram = {
+          [key]: value
+        };
+      }
+    },
+    UPDATE_TELEGRAM_INFO(state, { telegramInfo }) {
+      state.board.telegram = telegramInfo;
     }
   }
 });

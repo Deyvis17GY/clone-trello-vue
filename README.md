@@ -6,8 +6,8 @@ Application with vue 2 to create tasks with drag and drop dynamics
 
 ## Demo
 
-v.1 https://deyvis17gy.github.io/clone-trello-vue/
-v.2 https://clone-trello-vue.netlify.app/
+v.0.0.1 https://deyvis17gy.github.io/clone-trello-vue/
+v.0.1.0 https://clone-trello-vue.netlify.app/
 
 ## Run Locally
 

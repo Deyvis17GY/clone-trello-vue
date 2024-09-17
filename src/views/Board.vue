@@ -23,7 +23,7 @@
       <router-view />
     </div>
     <div class="task-bg" v-if="isTelegramForm" @click.self="closeTelegramForm">
-      <FormTelegram @onSaveData="onSaveData" />
+      <FormTelegram @onSaveData="onSaveData" :isLoading="isLoading" />
     </div>
     <div
       :class="activeItemRemove"
@@ -81,7 +81,8 @@ export default {
       changeStyleConfirm: {
         opacity: 0
       },
-      isTelegramForm: false
+      isTelegramForm: false,
+      isLoading: false
     };
   },
   methods: {
@@ -173,7 +174,7 @@ export default {
     closeTelegramForm() {
       this.isTelegramForm = false;
     },
-    onSaveData(e) {
+    async onSaveData(e) {
       e.preventDefault();
 
       let message = `**${"trello clone"}:**\n\n`;
@@ -197,28 +198,44 @@ export default {
 
       const formData = Object.fromEntries(new FormData(e.target));
 
-      fetch(`https://api.telegram.org/bot${formData.token}/sendMessage`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          chat_id: formData.chatId,
-          text: message, // El mensaje con el JSON formateado.
-          parse_mode: "Markdown"
-        })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.debug("Mensaje enviado:", data);
+      try {
+        this.isLoading = true;
+        const saveData = await fetch(
+          `https://api.telegram.org/bot${formData.token}/sendMessage`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              chat_id: formData.chatId,
+              text: message, // El mensaje con el JSON formateado.
+              parse_mode: "Markdown"
+            })
+          }
+        );
+
+        const response = await saveData.json();
+
+        if (response?.ok) {
+          console.debug("Mensaje enviado:", response);
           this.$store.commit("UPDATE_TELEGRAM_INFO", {
             telegramInfo: {
               chatId: formData.chatId,
               token: formData.token
             }
           });
-        })
-        .catch((error) => console.error("Error:", error));
+          this.$miniAlert({
+            text: "Se envío correctamente.",
+            autoremove: true,
+            time: 1500,
+            limit: 4
+          });
+        }
+      } catch (error) {
+      } finally {
+        this.isLoading = false;
+      }
     }
   },
   mounted() {}

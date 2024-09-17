@@ -7,7 +7,10 @@
         icon="question-circle"
         @click="goTutorial"
       />
-      <span class="question block sm:inline">Ver Tutorial (click)</span>
+      <span
+        class="question block sm:inline opacity-0 absolute bg-grey-darkest text-white"
+        >Ver Tutorial (click)</span
+      >
     </div>
     <form
       class="flex flex-col flex-group items-end justify-between px-4"
@@ -29,14 +32,22 @@
         @change="onChange($event, 'chatId')"
         placeholder="Chat ID"
       />
+
       <button
-        class="text-white p-2 rounded"
-        :class="{ 'bg-grey-dark': !isValid, 'bg-teal-dark': isValid }"
+        class="text-white p-2 rounded outline-none focus:outline-none"
+        :class="{
+          'bg-grey-dark': isLoading || !isValid,
+          'bg-teal-dark': !isLoading && isValid
+        }"
         type="submit"
-        :disabled="!isValid"
+        :disabled="isLoading && !isValid"
       >
         Guardar
       </button>
+      <span class="question w-5/5 block sm:inline"
+        >No almacenamos el token ni otros datos, ya que todo el procesamiento se
+        realiza localmente y no utilizamos servicios de terceros.</span
+      >
     </form>
   </div>
 </template>
@@ -49,6 +60,12 @@ export default {
     return {
       test: "AA"
     };
+  },
+  props: {
+    isLoading: {
+      type: Boolean,
+      required: false
+    }
   },
   computed: {
     ...mapGetters(["getTelegramInfo"]),
@@ -81,12 +98,13 @@ export default {
 
 <style>
 .form-view {
-  @apply relative flex-row bg-white pin mx-4 m-32 mx-auto py-4 text-left rounded shadow;
+  @apply relative flex-row bg-white pin  m-32 mx-auto py-4 text-left rounded shadow;
   max-width: 700px;
 }
 .question {
-  @apply absolute bg-grey-darkest text-white rounded-sm py-1  px-2 text-xs z-50 opacity-0;
+  @apply rounded-sm py-1  px-2  z-50;
   right: 6%;
+  font-size: 0.7rem;
 }
 .question-icon:hover ~ .question {
   opacity: 1;

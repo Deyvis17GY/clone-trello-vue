@@ -7,19 +7,22 @@
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "sh deploy.sh"
+    "deploy": "sh deploy.sh",
+    "deploy:netlify": "yarn build && yarn netlify deploy --dir=dist/ --prod"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.15",
     "@fortawesome/free-solid-svg-icons": "^5.7.2",
     "@fortawesome/vue-fontawesome": "^0.1.5",
     "mini-alert": "^1.0.8",
+    "netlify-cli": "^8.6.0",
     "siiimple-toast": "^3.1.7",
     "vue": "^2.6.6",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@fullhuman/postcss-purgecss": "^1.1.0",
     "@ky-is/vue-cli-plugin-tailwind": "^1.6.0",
     "@vue/cli-plugin-babel": "^3.5.0",

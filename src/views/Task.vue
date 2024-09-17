@@ -15,6 +15,7 @@
         @change="updateTaskProperty($event, 'description')"
         placeholder="new description"
       />
+      <p class="date-no-selected">{{ task.date }}</p>
     </div>
   </div>
 </template>
@@ -45,5 +46,12 @@ export default {
 .task-view {
   @apply relative flex-row bg-white pin mx-4 m-32 mx-auto py-4 text-left rounded shadow;
   max-width: 700px;
+}
+.date-no-selected {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
 }
 </style>

@@ -22,61 +22,27 @@
     <div class="task-bg" v-if="isTaskOpen" @click.self="closeTask">
       <router-view />
     </div>
+    <div class="task-bg" v-if="isTelegramForm" @click.self="closeTelegramForm">
+      <FormTelegram @onSaveData="onSaveData" :isLoading="isLoading" />
+    </div>
     <div
       :class="activeItemRemove"
-      @dragover.stop="activeRemove"
-      @dragleave.self="leaveRemove"
+      @dragenter="activeRemove"
+      @dragleave="leaveRemove"
       @drop="dropItem"
       @dragover.prevent
       @dragenter.prevent
     >
       Drag and drop items here to remove
     </div>
-    <div class="container-float">
-      <button title="Import" @click="activeInputUpload" class="upload">
-        <input @change="uploadBdJson" ref="inputUpload" type="file" hidden />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="icon icon-tabler icon-tabler-file-upload"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-          <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-          <path
-            d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
-          ></path>
-          <line x1="12" y1="11" x2="12" y2="17"></line>
-          <polyline points="9 14 12 11 15 14"></polyline>
-        </svg>
-      </button>
-      <button title="Download" @click="downloadBdTaskColumns" class="download">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="icon icon-tabler icon-tabler-download"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-          <polyline points="7 11 12 16 17 11" />
-          <line x1="12" y1="4" x2="12" y2="16" />
-        </svg>
-      </button>
-    </div>
-    <button style="display:none" class="removeTask"></button>
+
+    <FloatOptions
+      @changeInput="uploadBdJson"
+      @clickDownload="downloadBdTaskColumns"
+      @telegramSave="showTelegramForm"
+    />
+
+    <button style="display: none" class="removeTask"></button>
     <Alert
       :value="textConfirm"
       :timeSeconds="500"
@@ -89,10 +55,14 @@
 import { mapState } from "vuex";
 import BoardColumn from "@/components/BoardColumn";
 import Alert from "@/components/Alert";
+import FloatOptions from "@/components/FloatOptions";
+import FormTelegram from "./FormTelegram.vue";
 export default {
   components: {
     BoardColumn,
-    Alert
+    Alert,
+    FloatOptions,
+    FormTelegram
   },
   computed: {
     ...mapState(["board"]),
@@ -110,7 +80,9 @@ export default {
       textConfirm: "",
       changeStyleConfirm: {
         opacity: 0
-      }
+      },
+      isTelegramForm: false,
+      isLoading: false
     };
   },
   methods: {
@@ -131,6 +103,7 @@ export default {
       this.activeItemRemove.activeItemRemove = true;
     },
     leaveRemove(e) {
+      console.debug("leaveRemove", e);
       this.activeItemRemove.activeItemRemove = false;
     },
     dropItem(e) {
@@ -170,11 +143,7 @@ export default {
     downloadBdTaskColumns() {
       this.downloadColumnTask(this.board, "bd-task-columns");
     },
-    activeInputUpload() {
-      this.$refs.inputUpload.click();
-    },
-    uploadBdJson(e) {
-      const file = e.target.files[0];
+    uploadBdJson(file) {
       const fileType = file.type; // getting selected file type
       const validExtensions = "application/json"; // adding some valid image extensions in array
       if (!validExtensions.includes(fileType)) {
@@ -198,6 +167,75 @@ export default {
       setTimeout(() => {
         this.changeStyleConfirm.opacity = 0;
       }, (timeSeconds += 1000));
+    },
+    showTelegramForm() {
+      this.isTelegramForm = true;
+    },
+    closeTelegramForm() {
+      this.isTelegramForm = false;
+    },
+    async onSaveData(e) {
+      e.preventDefault();
+
+      let message = `**${"trello clone"}:**\n\n`;
+      this.board.columns.forEach((column) => {
+        const columnName =
+          typeof column.name === "string"
+            ? column.name.charAt(0).toUpperCase() + column.name.slice(1)
+            : "Unnamed Column";
+        message += `*${columnName}*:\n`;
+
+        column.tasks.forEach((task) => {
+          message += `• *${task.name}*:\n`;
+          message += `  - ID: ${task.id}\n`;
+          message += `  - Descripcoón: ${task.description || "None"}\n`;
+          if (task.date) {
+            message += `  - Date: ${task.date}\n`;
+          }
+          message += "\n";
+        });
+      });
+
+      const formData = Object.fromEntries(new FormData(e.target));
+
+      try {
+        this.isLoading = true;
+        const saveData = await fetch(
+          `https://api.telegram.org/bot${formData.token}/sendMessage`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              chat_id: formData.chatId,
+              text: message, // El mensaje con el JSON formateado.
+              parse_mode: "Markdown"
+            })
+          }
+        );
+
+        const response = await saveData.json();
+
+        if (response?.ok) {
+          console.debug("Mensaje enviado:", response);
+          this.$store.commit("UPDATE_TELEGRAM_INFO", {
+            telegramInfo: {
+              chatId: formData.chatId,
+              token: formData.token
+            }
+          });
+          this.$miniAlert({
+            text: "Se envío correctamente.",
+            autoremove: true,
+            time: 1500,
+            limit: 4
+          });
+        }
+      } catch (error) {
+      } finally {
+        this.isLoading = false;
+      }
     }
   },
   mounted() {}
@@ -207,10 +245,27 @@ export default {
 <style>
 .task {
   @apply flex items-center flex-wrap shadow mb-2 py-2 px-2 rounded bg-white text-grey-darkest no-underline;
+  overflow: hidden;
 }
 
 .board {
-  @apply p-4 bg-teal-dark h-full overflow-auto;
+  @apply p-4 h-full overflow-auto;
+  background: #3e92cc;
+}
+.board::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+.board::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+.board::-webkit-scrollbar-thumb {
+  background: #0a2463;
+  border-radius: 10px;
+}
+.board::-webkit-scrollbar-button:increment,
+.board::-webkit-scrollbar-button {
+  display: none;
 }
 
 .task-bg {
@@ -225,61 +280,12 @@ export default {
   margin: 0 25%;
   padding: 40px;
   /* Border */
-  border: 4px dashed rgba(0, 0, 0, 0.3);
+  border: 4px dashed #0a256362;
   border-radius: 4px;
 }
 .activeItemRemove {
-  background-color: #56958f;
+  background-color: #3e91cc;
   color: black;
-  border: 4px dashed hsl(207, 94%, 20%);
-}
-.container-float {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  z-index: 100000;
-}
-.container-float:hover {
-  height: 105px;
-  cursor: pointer;
-}
-.download {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  border: 1px solid hsl(207, 94%, 20%);
-  background: hsl(207, 94%, 20%);
-  color: #ffffff;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  z-index: 90090;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-}
-.upload {
-  border: 1px solid hsl(207, 94%, 20%);
-  background: hsl(207, 94%, 20%);
-  color: #ffffff;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  z-index: 90090;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-}
-.upload:hover,
-.download:hover {
-  background: #ffffff;
-  color: hsl(207, 94%, 20%);
-  border: #ffffff;
+  border: 4px dashed #0a2463;
 }
 </style>

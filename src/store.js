@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import defaultBoard from "./default-board";
 import { saveStatePlugin, uuid } from "./utils";
+import { format } from "@/utils";
 
 Vue.use(Vuex);
 
@@ -14,7 +15,7 @@ export default new Vuex.Store({
   },
   getters: {
     getTask(state) {
-      return id => {
+      return (id) => {
         for (const column of state.board.columns) {
           for (const task of column.tasks) {
             if (task.id === id) {
@@ -23,6 +24,9 @@ export default new Vuex.Store({
           }
         }
       };
+    },
+    getTelegramInfo(state) {
+      return state.board.telegram;
     }
   },
   mutations: {
@@ -30,7 +34,15 @@ export default new Vuex.Store({
       tasks.push({
         name,
         id: uuid(),
-        description: ""
+        description: "",
+        date: format(new Date(), "es-ES", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+          // hour: "2-digit",
+          // minute: "2-digit",
+          // second: "2-digit"
+        })
       });
     },
     UPDATE_TASK(state, { task, key, value }) {
@@ -62,6 +74,18 @@ export default new Vuex.Store({
     },
     IMPORT_DATA(state, { board }) {
       state.board = board;
+    },
+    UPDATE_TELEGRAM_INFO_BY_KEY(state, { value, key }) {
+      if (state.board?.telegram) {
+        state.board.telegram[key] = value;
+      } else {
+        state.board.telegram = {
+          [key]: value
+        };
+      }
+    },
+    UPDATE_TELEGRAM_INFO(state, { telegramInfo }) {
+      state.board.telegram = telegramInfo;
     }
   }
 });

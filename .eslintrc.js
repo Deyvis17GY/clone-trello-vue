@@ -10,6 +10,7 @@ module.exports = {
     quotes: ["error", "double"],
     semi: ["error", "always"],
     "space-before-function-paren": ["error", "never"]
+    // "comma-dangle": "off",
   },
   parserOptions: {
     parser: "babel-eslint"

@@ -1,7 +1,7 @@
 import { uuid } from "./utils";
 
 export default {
-  name: "workshop",
+  name: "trello clone",
   columns: [
     {
       name: "todo",
@@ -48,5 +48,9 @@ export default {
         }
       ]
     }
-  ]
+  ],
+  telegram: {
+    token: "",
+    chatId: ""
+  }
 };
